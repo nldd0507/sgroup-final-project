@@ -1,0 +1,26 @@
+{
+  "name": "sgroup-final-project",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "bun check",
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "db:migrate": "node db/migrate.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "5",
+    "pg": "^8.23.1"
+  }
+}

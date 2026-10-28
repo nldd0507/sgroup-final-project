@@ -1,0 +1,3 @@
+
+// Mo psql len de go sql truc tiep ben trong terminal 
+docker compose exec db psql -U sgroup -d sgroup_final_project
