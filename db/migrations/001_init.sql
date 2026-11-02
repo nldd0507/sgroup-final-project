@@ -81,4 +81,4 @@ Create Table submissions(
 Create index idx_submissions_member_id on submissions(member_id);
 
 INSERT INTO users (name, email, password_hash) VALUES ('A', 'a@a.com', 'x');
-INSERT INTO users (name, email, password_hash) VALUES ('B', 'a@a.com', 'x');
+INSERT INTO users (name, email, password_hash) VALUES ('B', 'b@b.com', 'x');

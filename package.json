@@ -10,17 +10,34 @@
     "typecheck": "bun check",
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "db:migrate": "node db/migrate.js"
+    "db:migrate": "node db/migrate.js",
+    "db:seed": "node prisma/seed.js"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bcrypt": "^6.0.0",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.10",
+    "prisma": "^5.22.0"
   },
   "peerDependencies": {
     "typescript": "^7"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.9",
     "express": "5",
-    "pg": "^8.23.1"
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true,
+    "esbuild@0.28.2": true,
+    "workerd@1.20261002.1": true,
+    "@prisma/engines@5.22.0": true,
+    "prisma@5.22.0": true,
+    "@prisma/client@5.22.0": true
   }
 }
