@@ -1,5 +1,10 @@
 import "dotenv/config"
 
+const required = (name) => {
+    if (!process.env[name]) throw new Error(`Missing env: ${name}`);
+    return process.env[name];
+};
+
 export const config = {
 
     app : {
@@ -15,10 +20,7 @@ export const config = {
         database: process.env.DB_NAME,
     },
     jwt: {
-        secret: process.env.JWT_SECRET || "default_jwt_secret_key",
-        accessSecret: process.env.JWT_ACCESS_SECRET || "default_access_secret",
-        refreshSecret: process.env.JWT_REFRESH_SECRET || "default_refresh_secret",
-        accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || "15m",
-        refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "2d",
+        accessSecret: required("JWT_ACCESS_SECRET"),
+        accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || "1d",
     },
 }
