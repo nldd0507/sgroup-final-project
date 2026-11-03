@@ -8,7 +8,7 @@ export const login = catchAsync(async (req, res) => {
 });
 
 export const getMe = catchAsync(async (req, res) => {
-  const currentUserId = req.user.sub || req.user.id;
+  const currentUserId = req.user.sub;
   const userProfile = await authService.getMe(currentUserId);
   return sendSuccess(res, 200, "Get profile successfully!", userProfile);
 });
