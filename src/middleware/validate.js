@@ -98,3 +98,6 @@ export const updateUserSchema = z
       message: "At least one field must be provided for update",
     }
   );
+export const refreshTokenRules = z.object({
+  refreshToken: z.string().min(1, "RefreshToken is required"),
+});

@@ -19,3 +19,36 @@ export const findById = async (id) => {
     },
   });
 };
+export const create = async ({ name, email, password, role = "MEMBER" }) => {
+  return await prisma.users.create({
+    data: {
+      name,
+      email,
+      password_hash: password,
+      role,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      created_at: true,
+    },
+  });
+};
+
+// Cập nhật refresh_token (dùng khi login và logout)
+export const updateRefreshToken = async (id, refreshToken) => {
+  return await prisma.users.update({
+    where: { id: Number(id) },
+    data: {
+      refresh_token: refreshToken,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      refresh_token: true,
+    },
+  });
+};
