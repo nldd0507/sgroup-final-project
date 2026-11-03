@@ -13,23 +13,22 @@ export const validate = (schema) => {
 
 export const registerSchema = z.object({
   name: z
-    .string({ required_error: "Tên không được để trống" })
+    .string({ required_error: "Name is required" })
     .trim()
-    .min(2, "Tên phải từ 2 ký tự trở lên")
-    .max(50, "Tên tối đa 50 ký tự"),
+    .min(2, "Name must be between 2 and 50 characters")
+    .max(50, "Name must be between 2 and 50 characters"),
 
   email: z
-    .string({ required_error: "Email không được để trống" })
+    .string({ required_error: "Email is required" })
     .trim()
-    .email("Email không đúng định dạng"),
+    .email("Email is not valid"),
 
   password: z
-    .string({ required_error: "Mật khẩu không được để trống" })
-    .min(8, "Mật khẩu phải có tối thiểu 8 ký tự"),
-
+    .string({ required_error: "Password is required" })
+    .min(8, "Password must be at least 8 characters"),
   role: z
     .enum(["ADMIN", "MEMBER"], {
-      errorMap: () => ({ message: "Role chỉ được phép là ADMIN hoặc MEMBER" }),
+      errorMap: () => ({ message: "Role must be ADMIN or MEMBER" }),
     })
     .optional(),
 });
@@ -37,13 +36,13 @@ export const registerSchema = z.object({
 // 2. Schema Đăng nhập 
 export const loginSchema = z.object({
   email: z
-    .string({ required_error: "Email không được để trống" })
+    .string({ required_error: "Email is required" })
     .trim()
-    .email("Email không đúng định dạng"),
+    .email("Email is not valid"),
 
   password: z
-    .string({ required_error: "Mật khẩu không được để trống" })
-    .min(8, "Mật khẩu phải có tối thiểu 8 ký tự"),
+    .string({ required_error: "Password is required" })
+    .min(8, "Password must be at least 8 characters"),
 });
 
 export const createUserSchema = z.object({
@@ -59,7 +58,7 @@ export const createUserSchema = z.object({
 
   password: z
     .string({ required_error: "Password is required" })
-    .min(8, "Mật khẩu phải có tối thiểu 8 ký tự"),
+    .min(8, "Password must be at least 8 characters"),
 
   role: z
     .enum(["ADMIN", "MEMBER"], {
@@ -74,8 +73,8 @@ export const updateUserSchema = z
     name: z
       .string()
       .trim()
-      .min(2, "Tên phải từ 2 đến 50 ký tự")
-      .max(50, "Tên phải từ 2 đến 50 ký tự")
+      .min(2, "Name must be between 2 and 50 characters")
+      .max(50, "Name must be between 2 and 50 characters")
       .optional(),
 
     email: z
@@ -84,18 +83,18 @@ export const updateUserSchema = z
 
     password: z
       .string()
-      .min(8, "Mật khẩu mới phải có tối thiểu 8 ký tự")
+      .min(8, "Password must be at least 8 characters")
       .optional(),
 
     role: z
       .enum(["ADMIN", "MEMBER"], {
-        errorMap: () => ({ message: "Role chỉ được phép là ADMIN hoặc MEMBER" }),
+        errorMap: () => ({ message: "Role must be ADMIN or MEMBER" }),
       })
       .optional(),
   })
   .refine(
     (data) => Object.keys(data).length > 0,
     {
-      message: "Cần cung cấp ít nhất một trường (name, email, password, role) để cập nhật",
+      message: "At least one field must be provided for update",
     }
   );
