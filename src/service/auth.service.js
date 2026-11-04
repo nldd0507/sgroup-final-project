@@ -15,7 +15,7 @@ export const register = async ({ name, email, password, role }) => {
   const newUser = await userRepository.create({
     name,
     email,
-    password: hashedPassword,
+    passwordHash: hashedPassword,
     role: role || "MEMBER",
   });
 

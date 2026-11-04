@@ -1,0 +1,75 @@
+### Dùng với extension "REST Client" (humao.rest-client) trong VS Code:
+### bấm "Send Request" phía trên mỗi request.
+
+@baseUrl = http://localhost:3000
+@password = Password123!
+
+### 1. Server sống?
+GET {{baseUrl}}/health
+
+### 2. Kết nối DB?
+GET {{baseUrl}}/health/db
+
+### 3. Login admin — token được lưu vào biến "login" để dùng ở các request sau
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@sgroup.com",
+  "password": "{{password}}"
+}
+
+### 4. Xem profile bằng token vừa lấy (chạy request 3 trước)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{login.response.body.data.accessToken}}
+
+### 5. Login member
+# @name loginMember
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "member@sgroup.com",
+  "password": "{{password}}"
+}
+
+### 6. Profile member
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{loginMember.response.body.data.accessToken}}
+
+### ---------- Các trường hợp lỗi ----------
+
+### 7. Sai password → mong đợi 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@sgroup.com",
+  "password": "SaiMatKhau1"
+}
+
+### 8. Email không tồn tại → mong đợi 401, cùng message với #7
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "khongton@tai.com",
+  "password": "SaiMatKhau1"
+}
+
+### 9. Body rỗng → mong đợi 400
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{}
+
+### 10. Không gửi token → mong đợi 401 (code hiện tại trả 500)
+GET {{baseUrl}}/auth/me
+
+### 11. Token rác → mong đợi 401 (code hiện tại trả 500)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer abc.def.ghi
+
+### 12. Route không tồn tại → mong đợi 404
+GET {{baseUrl}}/khong-ton-tai
