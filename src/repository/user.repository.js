@@ -49,3 +49,19 @@ export const update = async (id, data) => {
     select: user_public_fields,
   });
 };
+
+// Cập nhật refresh_token (dùng khi login và logout)
+export const updateRefreshToken = async (id, refreshToken) => {
+  return await prisma.users.update({
+    where: { id: Number(id) },
+    data: {
+      refresh_token: refreshToken,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      refresh_token: true,
+    },
+  });
+};
