@@ -19,3 +19,33 @@ export const findById = async (id) => {
     },
   });
 };
+
+export const user_public_fields = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  created_at: true,
+};
+
+export const create = async ({ name, email, passwordHash, role }) => {
+  return prisma.users.create({
+    data: { name, email, password_hash: passwordHash, role },
+    select: user_public_fields,
+  });
+};
+
+export const findAll = async () => {
+  return prisma.users.findMany({
+    select: user_public_fields,
+    orderBy: { id: "asc" },
+  });
+};
+
+export const update = async (id, data) => {
+  return prisma.users.update({
+    where: { id: Number(id) },
+    data,
+    select: user_public_fields,
+  });
+};
