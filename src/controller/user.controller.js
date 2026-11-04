@@ -1,4 +1,4 @@
-import { userIdParamSchema } from "../schema/user.schema.js";
+import { idParamSchema } from "../schema/common.schema.js";
 import * as userService from "../service/user.service.js";
 import catchAsync from "../utils/catchAsync.js";
 import { sendSuccess } from "../utils/responseHelper.js";
@@ -15,13 +15,13 @@ export const getUsers = catchAsync(async (req, res) => {
 });
 
 export const getUserById = catchAsync(async (req, res) => {
-  const { id } = userIdParamSchema.parse(req.params);
+  const { id } = idParamSchema.parse(req.params);
   const user = await userService.getUserById(id);
   return sendSuccess(res, 200, "Get user successfully", user);
 });
 
 export const updateUser = catchAsync(async (req, res) => {
-  const { id } = userIdParamSchema.parse(req.params);
+  const { id } = idParamSchema.parse(req.params);
   const user = await userService.updateUser(id, req.body);
   return sendSuccess(res, 200, "User updated successfully", user);
 });

@@ -25,14 +25,6 @@ export const createUserSchema = z.object({
   role: roleField.default("MEMBER"),
 });
 
-export const userIdParamSchema = z.object({
-  id: z.coerce
-    .number({ error: "User id must be a number" })
-    .int("User id must be an integer")
-    .positive("User id must be positive")
-    .max(2_147_483_647, "User id is out of range"),
-});
-
 export const updateUserSchema = z
   .object({
     name: nameField.optional(),
