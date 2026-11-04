@@ -3,18 +3,18 @@ import { UnauthorizedError, ForbiddenError } from "../core/error.response.js";
 
 export const authenticate = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; 
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
-    throw UnauthorizedError("Access token is missing or invalid");
+    throw new UnauthorizedError("Access token is missing or invalid");
   }
 
   try {
     const decoded = verifyAccessToken(token);
-    req.user = decoded; 
+    req.user = decoded;
     next();
   } catch (err) {
-    throw UnauthorizedError("Token is invalid or expired");
+    throw new UnauthorizedError("Token is invalid or expired");
   }
 };
 export const requireRole = (...allowedRoles) => {
