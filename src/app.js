@@ -2,7 +2,6 @@ import express from "express";
 import router from "./route/route.js";
 import errorHandler from "./middleware/errorHandler.js";
 import { NotFoundError } from "./core/error.response.js";
-import authRouter from "./route/auth.route.js";
 
 const app = express();
 
