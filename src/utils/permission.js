@@ -17,7 +17,7 @@ export const isMentorOfClass = async (userId, classId) => {
 export const isMemberOfClass = async (userId, classId) => {
   const membership = await prisma.class_members.findUnique({
     where: {
-      class_id_member_id: { class_id, member_id },
+      class_id_member_id: { class_id: Number(classId), member_id: Number(userId) },
     },
   });
 
