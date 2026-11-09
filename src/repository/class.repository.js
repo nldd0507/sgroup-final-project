@@ -35,3 +35,25 @@ export const create = (data) => prisma.classes.create({ data, select: class_fiel
 export const update = (id, data) =>
   prisma.classes.update({ where: { id: Number(id) }, data, select: class_fields });
 export const remove = (id) => prisma.classes.delete({ where: { id: Number(id) } });
+
+export const isMemberOfClass = async (classId, userId) => {
+  const membership = await prisma.class_members.findFirst({
+    where: {
+      class_id: Number(classId),
+      member_id: Number(userId),
+    },
+  });
+  return Boolean(membership);
+};
+
+export const classRepository = {
+  findAll,
+  findVisibleTo,
+  findById,
+  create,
+  update,
+  remove,
+  isMemberOfClass,
+};
+
+export default classRepository;
