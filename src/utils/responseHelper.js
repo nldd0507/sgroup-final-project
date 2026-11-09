@@ -1,4 +1,7 @@
 export const sendSuccess = (res, statusCode, message, data)  => {
+    if (statusCode === 204) {
+    return res.status(204).send();
+    }
     const body = {success: true, message};
     if(data !== undefined && data !==null) body.data = data;
     return res.status(statusCode).json(body);
