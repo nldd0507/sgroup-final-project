@@ -2,26 +2,8 @@ import * as userRepository from "../repository/user.repository.js";
 import { comparePassword } from "../utils/passwordHelper.js";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.helper.js";
 import { UnauthorizedError, NotFoundError } from "../core/error.response.js";
-import { hashPassword } from "../utils/passwordHelper.js";
-import { ConflictError } from "../core/error.response.js";
 
-export const register = async ({ name, email, password, role }) => {
-  const existingUser = await userRepository.findByEmail(email);
-  if (existingUser) {
-    throw new ConflictError("Email is already registered");
-  }
-
-  const hashedPassword = await hashPassword(password);
-  const newUser = await userRepository.create({
-    name,
-    email,
-    passwordHash: hashedPassword,
-    role: role || "MEMBER",
-  });
-
-  return newUser;
-};
-
+// Không có đăng ký công khai: tài khoản do Admin tạo qua POST /users (US-03, BR-06)
 export const login = async ({ email, password }) => {
   const user = await userRepository.findByEmail(email);
   if (!user) {
