@@ -1,8 +1,10 @@
 import { Router } from "express";
 import * as classController from "../controller/class.controller.js";
 import {lessonController} from "../controller/lesson.controller.js";
+import * as assignmentController  from "../controller/assignment.controller.js";
 import { authenticate, requireRole } from "../middleware/auth.middleware.js";
 import { createClassSchema, updateClassSchema } from "../schema/class.schema.js";
+import { createAssignmentSchema } from "../schema/assignment.schema.js";
 import { validate, createLessonSchema} from "../middleware/validate.js";
 
 const classRouter = Router();
@@ -20,5 +22,8 @@ classRouter.delete("/:id", adminOnly, classController.deleteClass);
 classRouter.post("/:id/lessons", authenticate, validate(createLessonSchema), lessonController.createLesson);
 classRouter.get("/:id/lessons", authenticate, lessonController.getLessonsByClass);
 classRouter.get("/:id/progress", authenticate, lessonController.getClassProgress);
+
+classRouter.post('/:id/assignments', validate(createAssignmentSchema), assignmentController.createAssignment);
+classRouter.get('/:id/assignments', assignmentController.getAssignmentsByClass);
 
 export default classRouter;
