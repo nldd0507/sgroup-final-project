@@ -15,7 +15,6 @@ export const findAll = () =>
     orderBy: { id: "asc" },
   });
 
-// BR-13: lớp mình làm mentor HOẶC lớp mình là member
 export const findVisibleTo = (userId) =>
   prisma.classes.findMany({
     where: {

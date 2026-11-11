@@ -5,11 +5,15 @@ import { authenticate, requireRole } from "../middleware/auth.middleware.js";
 import { createClassSchema, updateClassSchema } from "../schema/class.schema.js";
 import { validate, createLessonSchema } from "../middleware/validate.js";
 import classMemberRouter from "./classMember.route.js";
+import * as assignmentController from "../controller/assignment.controller.js";
+import { createAssignmentSchema } from "../schema/assignment.schema.js";
 
 const classRouter = Router();
 
 classRouter.use(authenticate);
 classRouter.use("/:id/members", classMemberRouter);
+classRouter.get("/:id/assignments", assignmentController.getByClass);
+classRouter.post("/:id/assignments", validate(createAssignmentSchema), assignmentController.create);
 const adminOnly = requireRole("ADMIN");
 
 classRouter.get("/", classController.getClasses);
