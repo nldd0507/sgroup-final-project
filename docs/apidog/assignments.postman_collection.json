@@ -1,0 +1,2891 @@
+{
+  "info": {
+    "name": "SGroup - Assignments (#22-#26)",
+    "description": "Bộ test API Assignment. Chạy theo thứ tự: Setup -> #22 -> #24 -> #23 -> #25 -> #26.\nCần environment có biến baseUrl (vd http://localhost:3000). Chạy `npm run seed` trước mỗi lần chạy.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Setup - Login",
+      "description": "Chạy trước để lấy token. Seed: npm run seed.",
+      "item": [
+        {
+          "name": "Login admin@sgroup.com",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.environment.get(\"password\")) pm.environment.set(\"password\", \"Password123!\");",
+                  "pm.environment.set(\"futureDeadline\", new Date(Date.now() + 7 * 86400000).toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const token = pm.response.json().data.accessToken;",
+                  "pm.test(\"Có accessToken\", () => pm.expect(token).to.be.a(\"string\"));",
+                  "pm.environment.set(\"adminToken\", token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sgroup.com\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login mentor@sgroup.com",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const token = pm.response.json().data.accessToken;",
+                  "pm.test(\"Có accessToken\", () => pm.expect(token).to.be.a(\"string\"));",
+                  "pm.environment.set(\"mentorToken\", token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"mentor@sgroup.com\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login mentor2@sgroup.com",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const token = pm.response.json().data.accessToken;",
+                  "pm.test(\"Có accessToken\", () => pm.expect(token).to.be.a(\"string\"));",
+                  "pm.environment.set(\"mentor2Token\", token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"mentor2@sgroup.com\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login member@sgroup.com",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const token = pm.response.json().data.accessToken;",
+                  "pm.test(\"Có accessToken\", () => pm.expect(token).to.be.a(\"string\"));",
+                  "pm.environment.set(\"memberToken\", token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"member@sgroup.com\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login member8@sgroup.com",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const token = pm.response.json().data.accessToken;",
+                  "pm.test(\"Có accessToken\", () => pm.expect(token).to.be.a(\"string\"));",
+                  "pm.environment.set(\"member8Token\", token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"member8@sgroup.com\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "#22 GET /classes/:id/assignments",
+      "description": "Xem danh sách assignment của lớp. Quyền: Admin, mentor của lớp, member của lớp.",
+      "item": [
+        {
+          "name": "22.1 Member xem BE 01 -> 200, 4 bài, không có description",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const list = pm.response.json().data;",
+                  "pm.test(\"Có 4 assignment\", () => pm.expect(list).to.be.an(\"array\").with.lengthOf(4));",
+                  "pm.test(\"Đúng field, không có description\", () => list.forEach((a) => {",
+                  "  pm.expect(a).to.have.all.keys(\"id\", \"classId\", \"title\", \"deadline\", \"maximumScore\");",
+                  "  pm.expect(a.classId).to.eql(1);",
+                  "}));",
+                  "pm.test(\"Sắp xếp theo deadline tăng dần\", () => {",
+                  "  const d = list.map((a) => new Date(a.deadline).getTime());",
+                  "  pm.expect(d).to.eql([...d].sort((x, y) => x - y));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "22.2 Mentor của lớp xem -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Là mảng\", () => pm.expect(pm.response.json().data).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "22.3 Admin xem -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "22.4 mentor2 (là member BE 01) xem -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentor2Token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "22.5 Không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "22.6 member8 (không thuộc lớp) -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{member8Token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "22.7 Lớp không tồn tại -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/999999/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "999999",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "22.8 Class id sai định dạng -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/abc/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "abc",
+                "assignments"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "#24 POST /classes/:id/assignments",
+      "description": "Tạo assignment. Quyền: chỉ mentor của lớp (BR-19, BR-28). Validate BR-20.",
+      "item": [
+        {
+          "name": "24.1 Mentor tạo hợp lệ -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const a = pm.response.json().data;",
+                  "pm.test(\"Trả về đủ field\", () => {",
+                  "  pm.expect(a).to.have.all.keys(\"id\", \"classId\", \"title\", \"description\", \"deadline\", \"maximumScore\");",
+                  "  pm.expect(a.classId).to.eql(1);",
+                  "  pm.expect(a.title).to.eql(\"Test Assignment - Apidog\");",
+                  "  pm.expect(a.maximumScore).to.eql(10);",
+                  "});",
+                  "pm.environment.set(\"createdAssignmentId\", a.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.2 Không có description vẫn tạo được -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set(\"createdAssignmentId2\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - no desc\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.3 Không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.4 Admin tạo -> 403 (BR-19)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.5 mentor2 tạo vào BE 01 (lớp khác) -> 403 (BR-28)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentor2Token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.6 Member tạo -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.7 Lớp không tồn tại -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/999999/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "999999",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.8 Class id sai định dạng -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/abc/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "abc",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.9 Thiếu title -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.10 Title 1 ký tự -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"A\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.11 Thiếu deadline -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.12 deadline = \"tomorrow\" -> 400 (BR-20)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"tomorrow\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.13 deadline = \"15/11/2026\" -> 400 (BR-20)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"15/11/2026\",\n  \"maximumScore\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.14 Thiếu maximumScore -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment\",\n  \"deadline\": \"{{futureDeadline}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.15 maximumScore = 0 -> 400 (BR-20)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.16 maximumScore = -5 -> 400 (BR-20)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": -5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.17 maximumScore = \"10\" (string) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": \"10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "24.18 maximumScore = 9.5 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Apidog\",\n  \"description\": \"Bài tập tạo từ bộ test Apidog\",\n  \"deadline\": \"{{futureDeadline}}\",\n  \"maximumScore\": 9.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "#23 GET /assignments/:id",
+      "description": "Xem chi tiết assignment (có description). Quyền: Admin, mentor của lớp, member của lớp.",
+      "item": [
+        {
+          "name": "23.1 Member xem assignment 1 -> 200, có description",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const a = pm.response.json().data;",
+                  "pm.test(\"Có description và đúng field\", () => {",
+                  "  pm.expect(a).to.have.all.keys(\"id\", \"classId\", \"title\", \"description\", \"deadline\", \"maximumScore\");",
+                  "  pm.expect(a.id).to.eql(1);",
+                  "  pm.expect(a.title).to.eql(\"HTTP & REST API\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "23.2 Mentor xem assignment vừa tạo -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Đúng bài vừa tạo\", () => pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"createdAssignmentId\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "23.3 Admin xem -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "23.4 Không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "23.5 member8 (không thuộc lớp) -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{member8Token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "23.6 Assignment không tồn tại -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "23.7 Id sai định dạng -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "abc"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "#25 PATCH /assignments/:id",
+      "description": "Sửa assignment. Quyền: chỉ mentor của lớp (BR-19, BR-28).",
+      "item": [
+        {
+          "name": "25.1 Mentor sửa maximumScore = 20 -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const a = pm.response.json().data;",
+                  "pm.test(\"maximumScore đã đổi, title giữ nguyên\", () => {",
+                  "  pm.expect(a.maximumScore).to.eql(20);",
+                  "  pm.expect(a.title).to.eql(\"Test Assignment - Apidog\");",
+                  "});",
+                  "pm.test(\"Không tạo bài mới (id giữ nguyên)\", () => pm.expect(a.id).to.eql(Number(pm.environment.get(\"createdAssignmentId\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.2 Mentor sửa title + deadline -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const a = pm.response.json().data;",
+                  "pm.test(\"Đã cập nhật\", () => {",
+                  "  pm.expect(a.title).to.eql(\"Test Assignment - Updated\");",
+                  "  pm.expect(new Date(a.deadline).toISOString()).to.eql(\"2026-12-31T23:59:00.000Z\");",
+                  "  pm.expect(a.maximumScore).to.eql(20);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Assignment - Updated\",\n  \"deadline\": \"2026-12-31T23:59:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.3 Body rỗng {} -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.4 maximumScore = 0 -> 400 (BR-20)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.5 deadline sai định dạng -> 400 (BR-20)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deadline\": \"tomorrow\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.6 Không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.7 Admin sửa -> 403 (BR-19)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.8 Member sửa -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.9 mentor2 sửa assignment 1 của BE 01 -> 403 (BR-28)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentor2Token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.10 mentor sửa assignment 5 của FE 01 -> 403 (BR-28)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "5"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.11 Assignment không tồn tại -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "25.12 Id sai định dạng -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maximumScore\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assignments/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "abc"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "#26 DELETE /assignments/:id",
+      "description": "Xóa assignment. Quyền: chỉ mentor của lớp (BR-19, BR-28). Chạy cuối để dọn dữ liệu test.",
+      "item": [
+        {
+          "name": "26.1 Không token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.2 Admin xóa -> 403 (BR-19)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.3 Member xóa -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{memberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.4 mentor2 xóa bài của BE 01 -> 403 (BR-28)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentor2Token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.5 Id sai định dạng -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "abc"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.6 Assignment không tồn tại -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.7 Mentor xóa bài vừa tạo -> 204",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));",
+                  "pm.test(\"Không có body\", () => pm.expect(pm.response.text()).to.eql(\"\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.8 GET lại bài đã xóa -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.9 Xóa lại lần 2 -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"success = false, có message\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.success).to.eql(false);",
+                  "  pm.expect(b.message).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.10 Dọn bài thứ 2 (no desc) -> 204",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assignments/{{createdAssignmentId2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assignments",
+                "{{createdAssignmentId2}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "26.11 BE 01 vẫn còn đúng 4 bài seed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const ids = pm.response.json().data.map((a) => a.id);",
+                  "pm.test(\"Không còn bài test vừa tạo\", () => {",
+                  "  pm.expect(ids).to.not.include(Number(pm.environment.get(\"createdAssignmentId\")));",
+                  "  pm.expect(ids).to.not.include(Number(pm.environment.get(\"createdAssignmentId2\")));",
+                  "});",
+                  "pm.test(\"Còn 4 assignment\", () => pm.expect(ids).to.have.lengthOf(4));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mentorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classes",
+                "1",
+                "assignments"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ]
+}
