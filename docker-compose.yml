@@ -3,18 +3,40 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_USER: sgroup
-      POSTGRES_PASSWORD: sgroup
-      POSTGRES_DB: sgroup_final_project
+      POSTGRES_USER: ${DB_USER:-sgroup}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sgroup}
+      POSTGRES_DB: ${DB_NAME:-sgroup_final_project}
     ports:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sgroup -d sgroup_final_project"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      # Không đặt production: seed tự chặn khi NODE_ENV=production
+      NODE_ENV: development
+      # Trong mạng Docker gọi DB bằng tên service "db" và port gốc 5432
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-sgroup}
+      DB_PASSWORD: ${DB_PASSWORD:-sgroup}
+      DB_NAME: ${DB_NAME:-sgroup_final_project}
+      DATABASE_URL: postgresql://${DB_USER:-sgroup}:${DB_PASSWORD:-sgroup}@db:5432/${DB_NAME:-sgroup_final_project}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-change_me_in_env}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-1d}
+    ports:
+      - "3000:3000"
 
 volumes:
   pgdata:
