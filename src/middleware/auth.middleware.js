@@ -1,7 +1,8 @@
-import { verifyAccessToken } from "../utils/jwt.helper.js";
+import { isTokenRevoked } from "../utils/tokenDenylist.js";
 import { UnauthorizedError, ForbiddenError } from "../core/error.response.js";
+import { verifyAccessToken } from "../utils/jwt.helper.js";
 
-export const authenticate = (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
@@ -9,13 +10,18 @@ export const authenticate = (req, res, next) => {
     throw new UnauthorizedError("Access token is missing or invalid");
   }
 
+  let decoded;
   try {
-    const decoded = verifyAccessToken(token);
-    req.user = decoded;
-    next();
+    decoded = verifyAccessToken(token);
   } catch (err) {
     throw new UnauthorizedError("Token is invalid or expired");
   }
+
+  if (await isTokenRevoked(decoded.jti)) {
+    throw new UnauthorizedError("Token has been revoked");
+  }
+  req.user = decoded;
+  next();
 };
 export const requireRole = (...allowedRoles) => {
   return (req, res, next) => {

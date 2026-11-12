@@ -35,5 +35,10 @@ export class ConflictError extends ApiError {
     super(409, message);
   }
 }
+export class TooManyRequestsError extends ApiError {
+  constructor(message = "Too Many Requests") {
+    super(429, message);
+  }
+}
 
 export default ApiError;

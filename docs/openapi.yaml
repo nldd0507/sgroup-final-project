@@ -1,0 +1,640 @@
+openapi: 3.0.3
+info:
+  title: S-Group Learning Platform API
+  version: 1.0.0
+  description: |
+    Hệ thống quản lý lớp học nội bộ: Admin, Mentor, Member.
+
+    **Cách thử:** gọi `POST /auth/login` → copy `data.accessToken` → bấm **Authorize** → dán token.
+
+    Tài khoản seed (mật khẩu `Password123!`): `admin@sgroup.com`, `mentor@sgroup.com` (mentor lớp 1),
+    `member@sgroup.com` (member lớp 1, 2), `member8@sgroup.com` (không thuộc lớp nào).
+
+    Ký hiệu quyền: **A** Admin, **M** mentor của lớp, **S** member của lớp, **Me** chính chủ.
+
+    Response thành công luôn có dạng `{ "success": true, "message": "...", "data": ... }`.
+    Các schema bên dưới mô tả phần `data`. Response lỗi có dạng `{ "success": false, "message": "..." }`.
+servers:
+  - url: http://localhost:3000
+security:
+  - bearerAuth: []
+tags:
+  - name: Health
+  - name: Auth
+  - name: Users
+  - name: Classes
+  - name: Class Members
+  - name: Lessons
+  - name: Assignments
+  - name: Submissions
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+    MemberId:
+      name: memberId
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+
+  responses:
+    BadRequest:
+      description: Dữ liệu không hợp lệ
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Unauthorized:
+      description: Thiếu hoặc sai token
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Forbidden:
+      description: Không có quyền
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    NotFound:
+      description: Không tìm thấy
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Conflict:
+      description: Trùng dữ liệu
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    NoContent:
+      description: Thành công, không có body
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string, example: "Only the mentor of this class can perform this action" }
+
+    User:
+      type: object
+      properties:
+        id: { type: integer, example: 9 }
+        name: { type: string, example: Hoc Vien SGroup }
+        email: { type: string, example: member@sgroup.com }
+        role: { type: string, enum: [ADMIN, MEMBER] }
+        createdAt: { type: string, format: date-time }
+    UserCreate:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 50, example: Mentor One }
+        email: { type: string, format: email, example: mentor1@sgroup.com }
+        password: { type: string, minLength: 8, example: Password123! }
+        role: { type: string, enum: [ADMIN, MEMBER], default: MEMBER }
+    UserUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 2, maxLength: 50 }
+        role: { type: string, enum: [ADMIN, MEMBER] }
+        password: { type: string, minLength: 8 }
+
+    Class:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        name: { type: string, example: BE Basic - Batch 01 }
+        description: { type: string, nullable: true }
+        startDate: { type: string, format: date, example: "2026-11-01" }
+        endDate: { type: string, format: date, example: "2026-12-30" }
+        mentorId: { type: integer, example: 4 }
+    ClassDetail:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        mentor:
+          type: object
+          properties:
+            id: { type: integer, example: 4 }
+            name: { type: string, example: Mentor Alpha }
+    ClassCreate:
+      type: object
+      required: [name, startDate, endDate, mentorId]
+      properties:
+        name: { type: string, example: BE Basic - Batch 02 }
+        description: { type: string }
+        startDate: { type: string, format: date, example: "2026-12-01" }
+        endDate: { type: string, format: date, example: "2027-01-31", description: "Phải sau startDate (BR-07)" }
+        mentorId: { type: integer, example: 4 }
+    ClassUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string }
+        description: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        mentorId: { type: integer, description: "Đổi mentor = chỉ định mentor" }
+
+    ClassMember:
+      type: object
+      properties:
+        memberId: { type: integer, example: 9 }
+        name: { type: string }
+        email: { type: string }
+        joinedAt: { type: string, format: date-time }
+    ClassMemberCreated:
+      type: object
+      properties:
+        classId: { type: integer, example: 8 }
+        memberId: { type: integer, example: 16 }
+        joinedAt: { type: string, format: date-time }
+
+    LessonListItem:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        classId: { type: integer, example: 1 }
+        title: { type: string, example: HTTP & Client-Server }
+        order: { type: integer, example: 1 }
+        completed: { type: boolean, description: "Chỉ có khi người gọi là member của lớp" }
+    Lesson:
+      type: object
+      properties:
+        id: { type: integer }
+        classId: { type: integer }
+        title: { type: string }
+        content: { type: string }
+        order: { type: integer }
+        createdBy: { type: integer }
+    LessonCreate:
+      type: object
+      required: [title, order]
+      properties:
+        title: { type: string, maxLength: 200, example: Middleware nâng cao }
+        content: { type: string, default: "" }
+        order: { type: integer, minimum: 1, example: 9, description: "Duy nhất trong lớp (BR-15)" }
+    LessonUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        title: { type: string, maxLength: 200 }
+        content: { type: string }
+        order: { type: integer, minimum: 1 }
+    LessonProgress:
+      type: object
+      properties:
+        lessonId: { type: integer }
+        memberId: { type: integer }
+        completedAt: { type: string, format: date-time }
+    ClassProgress:
+      type: object
+      properties:
+        totalLessons: { type: integer, example: 8 }
+        completedLessons: { type: integer, example: 3 }
+        progress: { type: integer, example: 38, description: "round(completed / total × 100), 0 nếu chưa có lesson" }
+
+    AssignmentListItem:
+      type: object
+      properties:
+        id: { type: integer }
+        classId: { type: integer }
+        title: { type: string }
+        deadline: { type: string, format: date-time }
+        maximumScore: { type: integer }
+    Assignment:
+      allOf:
+        - $ref: "#/components/schemas/AssignmentListItem"
+        - type: object
+          properties:
+            description: { type: string, nullable: true }
+    AssignmentCreate:
+      type: object
+      required: [title, deadline, maximumScore]
+      properties:
+        title: { type: string, minLength: 2, maxLength: 200, example: HTTP API }
+        description: { type: string, maxLength: 5000 }
+        deadline: { type: string, format: date-time, example: "2026-12-15T23:59:00.000Z" }
+        maximumScore: { type: integer, minimum: 1, example: 10 }
+    AssignmentUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        title: { type: string, minLength: 2, maxLength: 200 }
+        description: { type: string, maxLength: 5000 }
+        deadline: { type: string, format: date-time }
+        maximumScore: { type: integer, minimum: 1 }
+
+    Submission:
+      type: object
+      properties:
+        id: { type: integer }
+        assignmentId: { type: integer }
+        memberId: { type: integer }
+        content: { type: string, nullable: true }
+        repositoryUrl: { type: string, nullable: true }
+        submittedAt: { type: string, format: date-time }
+        score: { type: integer, nullable: true, description: "null = chưa chấm (BR-27)" }
+        feedback: { type: string, nullable: true }
+        reviewedAt: { type: string, format: date-time, nullable: true }
+    SubmissionCreate:
+      type: object
+      description: "Cần ít nhất content hoặc repositoryUrl (BR-24)"
+      properties:
+        content: { type: string, maxLength: 10000, example: Em đã hoàn thành bài tập }
+        repositoryUrl: { type: string, format: uri, example: https://github.com/user/repo }
+    Review:
+      type: object
+      required: [score]
+      properties:
+        score: { type: integer, minimum: 0, example: 8, description: "0 ≤ score ≤ maximumScore (BR-26)" }
+        feedback: { type: string, maxLength: 5000, example: "Làm tốt, cần bổ sung validation" }
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Kiểm tra server
+      security: []
+      responses:
+        "200": { description: Server đang chạy }
+  /health/db:
+    get:
+      tags: [Health]
+      summary: Kiểm tra kết nối DB
+      security: []
+      responses:
+        "200": { description: DB kết nối được }
+
+  # ---------------- Auth ----------------
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: "#1 Đăng nhập (Public)"
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, example: admin@sgroup.com }
+                password: { type: string, example: Password123! }
+      responses:
+        "200": { description: "Trả accessToken, refreshToken và user" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /auth/refresh-token:
+    post:
+      tags: [Auth]
+      summary: Lấy access token mới bằng refresh token (Public)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        "200": { description: Trả accessToken mới }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Đăng xuất, hủy refresh token (Any)
+      responses:
+        "200": { description: OK }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: "#2 Thông tin người đang đăng nhập (Any)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  # ---------------- Users ----------------
+  /users:
+    get:
+      tags: [Users]
+      summary: "#3 Danh sách user (A)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/User" } } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      tags: [Users]
+      summary: "#5 Tạo user (A)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/UserCreate" } } }
+      responses:
+        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /users/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Users]
+      summary: "#4 Chi tiết user (A)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Users]
+      summary: "#6 Sửa user (A)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/UserUpdate" } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  # ---------------- Classes ----------------
+  /classes:
+    get:
+      tags: [Classes]
+      summary: "#7 Danh sách lớp (Any, lọc theo vai trò)"
+      responses:
+        "200": { description: "Admin thấy tất cả; người khác thấy lớp mình dạy hoặc học", content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Class" } } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Classes]
+      summary: "#9 Tạo lớp (A)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/ClassCreate" } } }
+      responses:
+        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/Class" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /classes/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Classes]
+      summary: "#8 Chi tiết lớp (A, M, S)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/ClassDetail" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Classes]
+      summary: "#10 Sửa lớp, chỉ định mentor (A)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/ClassUpdate" } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Class" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Classes]
+      summary: "#11 Xóa lớp (A), xóa theo member, lesson, assignment, submission"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ---------------- Class Members ----------------
+  /classes/{id}/members:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Class Members]
+      summary: "#12 Danh sách member của lớp (A, M)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/ClassMember" } } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [Class Members]
+      summary: "#13 Thêm member vào lớp (A)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [memberId]
+              properties:
+                memberId: { type: integer, example: 16 }
+      responses:
+        "201": { description: Đã thêm, content: { application/json: { schema: { $ref: "#/components/schemas/ClassMemberCreated" } } } }
+        "400": { description: "Body sai, hoặc thêm mentor của lớp làm member" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /classes/{id}/members/{memberId}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+      - $ref: "#/components/parameters/MemberId"
+    delete:
+      tags: [Class Members]
+      summary: "#14 Xóa member khỏi lớp (A)"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ---------------- Lessons ----------------
+  /classes/{id}/lessons:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Lessons]
+      summary: "#15 Danh sách lesson của lớp (A, M, S)"
+      responses:
+        "200": { description: "Sắp theo order", content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/LessonListItem" } } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [Lessons]
+      summary: "#17 Tạo lesson (M)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/LessonCreate" } } }
+      responses:
+        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /lessons/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Lessons]
+      summary: "#16 Chi tiết lesson (A, M, S)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Lessons]
+      summary: "#18 Sửa lesson (M)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/LessonUpdate" } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Lessons]
+      summary: "#19 Xóa lesson (M)"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /lessons/{id}/complete:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [Lessons]
+      summary: "#20 Đánh dấu hoàn thành lesson (S), gọi lại không tạo bản ghi mới"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/LessonProgress" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /classes/{id}/progress:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Lessons]
+      summary: "#21 Tiến độ học của chính mình (S)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/ClassProgress" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ---------------- Assignments ----------------
+  /classes/{id}/assignments:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Assignments]
+      summary: "#22 Danh sách assignment của lớp (A, M, S)"
+      responses:
+        "200": { description: "Sắp theo deadline tăng dần", content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/AssignmentListItem" } } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [Assignments]
+      summary: "#24 Tạo assignment (M)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/AssignmentCreate" } } }
+      responses:
+        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /assignments/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Assignments]
+      summary: "#23 Chi tiết assignment (A, M, S)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Assignments]
+      summary: "#25 Sửa assignment (M)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/AssignmentUpdate" } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Assignments]
+      summary: "#26 Xóa assignment (M), xóa theo các bài nộp"
+      responses:
+        "204": { $ref: "#/components/responses/NoContent" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ---------------- Submissions ----------------
+  /assignments/{id}/submissions:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [Submissions]
+      summary: "#27 Nộp bài (S), mỗi người 1 lần, trước deadline"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/SubmissionCreate" } } }
+      responses:
+        "201": { description: Đã nộp, content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } } }
+        "400": { description: "Quá deadline, hoặc thiếu cả content và repositoryUrl, hoặc URL sai" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { description: "Đã nộp rồi (BR-22)" }
+    get:
+      tags: [Submissions]
+      summary: "#28 Danh sách bài nộp (M: cả lớp, S: chỉ bài của mình)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Submission" } } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /submissions/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Submissions]
+      summary: "#29 Chi tiết bài nộp (M, Me)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /submissions/{id}/review:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    patch:
+      tags: [Submissions]
+      summary: "#30 Chấm bài (M)"
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/Review" } } }
+      responses:
+        "200": { description: "Có score, feedback, reviewedAt", content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } } }
+        "400": { description: "score < 0 hoặc score > maximumScore" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
