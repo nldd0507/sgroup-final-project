@@ -15,12 +15,23 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   backend:
     build: .
     restart: unless-stopped
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     environment:
       PORT: 3000
@@ -35,6 +46,8 @@ services:
       DATABASE_URL: postgresql://${DB_USER:-sgroup}:${DB_PASSWORD:-sgroup}@db:5432/${DB_NAME:-sgroup_final_project}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-change_me_in_env}
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-1d}
+      # Trong mạng Docker gọi Redis bằng tên service "redis" và port gốc 6379
+      REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
 

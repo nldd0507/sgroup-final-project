@@ -1,19 +1,31 @@
 import * as userRepository from "../repository/user.repository.js";
 import { comparePassword } from "../utils/passwordHelper.js";
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.helper.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../utils/jwt.helper.js";
 import { UnauthorizedError, NotFoundError } from "../core/error.response.js";
+import {
+  assertNotLocked,
+  loginFailKey,
+  recordFailure,
+  resetFailures,
+} from "../utils/loginLimiter.js";
+import { revokeToken } from "../utils/tokenDenylist.js";
 
 // Không có đăng ký công khai: tài khoản do Admin tạo qua POST /users (US-03, BR-06)
-export const login = async ({ email, password }) => {
+export const login = async ({ email, password }, ip = "unknown") => {
+  const failKey = loginFailKey(email, ip);
+  await assertNotLocked(failKey);
   const user = await userRepository.findByEmail(email);
-  if (!user) {
-    throw new UnauthorizedError("Invalid email or password");
-  }
+  const isMatch = user ? await comparePassword(password, user.password_hash) : false;
 
-  const isMatch = await comparePassword(password, user.password_hash);
   if (!isMatch) {
+    await recordFailure(failKey);
     throw new UnauthorizedError("Invalid email or password");
   }
+  await resetFailures(failKey);
 
   const payload = {
     sub: user.id,
@@ -21,7 +33,7 @@ export const login = async ({ email, password }) => {
   };
   const accessToken = generateAccessToken(payload);
   const refreshToken = generateRefreshToken({ sub: user.id });
-    // 4. Lưu refresh token vào DB để quản lý phiên
+  // 4. Lưu refresh token vào DB để quản lý phiên
   await userRepository.updateRefreshToken(user.id, refreshToken);
   const userResponse = {
     id: user.id,
@@ -71,7 +83,8 @@ export const getMe = async (userId) => {
   return user;
 };
 
-export const logout = async (userId) => {
-  await userRepository.updateRefreshToken(userId, null);
+export const logout = async (user) => {
+  await userRepository.updateRefreshToken(user.sub, null);
+  await revokeToken(user);
   return true;
 };

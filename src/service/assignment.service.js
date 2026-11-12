@@ -1,6 +1,7 @@
 import * as assignmentRepository from "../repository/assignment.repository.js";
 import { NotFoundError } from "../core/error.response.js";
 import { assertCanViewClass, assertMentorOfClass } from "../utils/permission.js";
+import { cacheKeys, forget, remember } from "../utils/cache.js";
 
 export const toAssignmentResponse = (a, { withDescription = false } = {}) => ({
   id: a.id,
@@ -20,7 +21,9 @@ export const findAssignmentOrNotFound = async (id) => {
 export const getByClass = async (user, classId) => {
   await assertCanViewClass(user, classId);
 
-  return (await assignmentRepository.findByClass(classId)).map((a) => toAssignmentResponse(a));
+  return remember(cacheKeys.assignmentsOfClass(classId), async () =>
+    (await assignmentRepository.findByClass(classId)).map((a) => toAssignmentResponse(a))
+  );
 };
 
 export const getById = async (user, id) => {
@@ -38,6 +41,7 @@ export const create = async (user, classId, { title, description, deadline, maxi
     deadline: new Date(deadline),
     maximum_score: maximumScore,
   });
+  await forget(cacheKeys.assignmentsOfClass(classId));
   return toAssignmentResponse(a, { withDescription: true });
 };
 
@@ -49,13 +53,13 @@ export const update = async (user, id, body) => {
   if (body.description !== undefined) data.description = body.description;
   if (body.deadline !== undefined) data.deadline = new Date(body.deadline);
   if (body.maximumScore !== undefined) data.maximum_score = body.maximumScore;
-  return toAssignmentResponse(await assignmentRepository.update(id, data), {
-    withDescription: true,
-  });
+  const updated = await assignmentRepository.update(id, data);
+  await forget(cacheKeys.assignmentsOfClass(a.class_id));
+  return toAssignmentResponse(updated, { withDescription: true });
 };
-
 export const remove = async (user, id) => {
   const a = await findAssignmentOrNotFound(id);
   await assertMentorOfClass(user, a.class_id);
   await assignmentRepository.remove(id);
+  await forget(cacheKeys.assignmentsOfClass(a.class_id));
 };

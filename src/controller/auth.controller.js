@@ -3,7 +3,7 @@ import catchAsync from "../utils/catchAsync.js";
 import { sendSuccess } from "../utils/responseHelper.js";
 
 export const login = catchAsync(async (req, res) => {
-  const result = await authService.login(req.body);
+  const result = await authService.login(req.body, req.ip);
   return sendSuccess(res, 200, "Login successfully!", result);
 });
 
@@ -20,7 +20,6 @@ export const getMe = catchAsync(async (req, res) => {
 });
 
 export const logout = catchAsync(async (req, res) => {
-  const currentUserId = req.user.sub || req.user.id;
-  await authService.logout(currentUserId);
+  await authService.logout(req.user);
   return sendSuccess(res, 200, "Logout successfully!");
 });
