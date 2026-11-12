@@ -1,27 +1,28 @@
-import * as submissionService from '../service/submission.service.js';
-import catchAsync from '../utils/catchAsync.js';
-import { sendSuccess } from '../utils/responseHelper.js';
+import { idParamSchema } from "../schema/common.schema.js";
+import * as submissionService from "../service/submission.service.js";
+import catchAsync from "../utils/catchAsync.js";
+import { sendSuccess } from "../utils/responseHelper.js";
 
-export const submitAssignment = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await submissionService.submitAssignment(id, req.body, req.user);
-  return sendSuccess(res, 200, 'Assignment submitted successfully!', result);
+export const submit = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const submission = await submissionService.submit(req.user, id, req.body);
+  return sendSuccess(res, 201, "Submitted successfully", submission);
 });
 
-export const getSubmissionsByAssignment = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await submissionService.getSubmissionsByAssignment(id, req.user);
-  return sendSuccess(res, 200, 'Get submissions successfully!', result);
+export const listForAssignment = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const submissions = await submissionService.listForAssignment(req.user, id);
+  return sendSuccess(res, 200, "Get submissions successfully", submissions);
 });
 
-export const getSubmissionById = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await submissionService.getSubmissionById(id, req.user);
-  return sendSuccess(res, 200, 'Get submission details successfully!', result);
+export const getById = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const submission = await submissionService.getById(req.user, id);
+  return sendSuccess(res, 200, "Get submission successfully", submission);
 });
 
-export const reviewSubmission = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await submissionService.reviewSubmission(id, req.body, req.user);
-  return sendSuccess(res, 200, 'Submission reviewed successfully!', result);
+export const review = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const submission = await submissionService.review(req.user, id, req.body);
+  return sendSuccess(res, 200, "Submission reviewed successfully", submission);
 });

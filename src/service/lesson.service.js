@@ -1,6 +1,7 @@
 import { lessonRepository } from "../repository/lesson.repository.js";
 import classRepository from "../repository/class.repository.js";
 import { ForbiddenError, NotFoundError, ConflictError } from "../core/error.response.js";
+import { isMemberOfClass } from "../utils/permission.js";
 
 // Helper kiểm tra quyền xem lớp học: ADMIN, Mentor của lớp hoặc Member trong lớp
 async function assertCanViewClass(classId, user) {
@@ -13,7 +14,7 @@ async function assertCanViewClass(classId, user) {
 
   if (isAdmin || isMentor) return cls;
 
-  const isMember = await classRepository.isMemberOfClass(Number(classId), Number(userId));
+  const isMember = await isMemberOfClass(userId, classId);
   if (isMember) return cls;
 
   throw new ForbiddenError("You do not have permission to view this class");
@@ -129,10 +130,7 @@ export const lessonService = {
     if (!lesson) throw new NotFoundError("Lesson not found");
 
     const userId = user.id ?? user.sub;
-    const isMember = await classRepository.isMemberOfClass(
-      Number(lesson.class_id),
-      Number(userId)
-    );
+    const isMember = await isMemberOfClass(userId, lesson.class_id);
     if (!isMember) {
       throw new ForbiddenError("Only enrolled members can complete this lesson");
     }

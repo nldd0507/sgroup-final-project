@@ -1,64 +1,28 @@
 import { z } from "zod";
 
-const dateField = (fieldName) =>
-  z
-    .string({
-      error: `${fieldName} is required`,
-    })
-    .refine((val) => !isNaN(Date.parse(val)), {
-      message: `Invalid ${fieldName.toLowerCase()} format`,
-    });
-
-const assignmentFields = {
+const fields = {
   title: z
     .string({
       error: "Title is required",
     })
     .trim()
-    .min(1, "Title cannot be empty")
-    .max(255),
-  description: z.string().trim().max(2000).optional(),
+    .min(2, "Title must be at least 2 characters")
+    .max(200),
+  description: z.string().trim().max(5000).optional(),
+  deadline: z.iso.datetime({ error: "Deadline must be an ISO 8601 datetime" }),
   maximumScore: z
-    .number({
-      error: "Maximum score is required",
-    })
-    .positive("Maximum score must be > 0"),
-  deadline: dateField("Deadline"),
+    .number({ error: "Maximum score must be a number" })
+    .int("Maximum score must be an integer")
+    .positive("Maximum score must be greater than 0"),
 };
 
-// 1. Schema tạo bài tập
-export const createAssignmentSchema = z.object({
-  ...assignmentFields,
-});
+export const createAssignmentSchema = z.object(fields);
 
-// 2. Schema cập nhật bài tập (các trường đều optional)
-export const updateAssignmentSchema = z.object({
-  title: assignmentFields.title.optional(),
-  description: assignmentFields.description,
-  maximumScore: assignmentFields.maximumScore.optional(),
-  deadline: dateField("Deadline").optional(),
-});
-
-// 3. Schema nộp bài (Level 7: có content hoặc repositoryUrl)
-export const submitAssignmentSchema = z
+export const updateAssignmentSchema = z
   .object({
-    content: z.string().trim().max(5000).optional(),
-    repositoryUrl: z
-      .string()
-      .trim()
-      .url("Invalid repository URL format")
-      .optional(),
+    title: fields.title.optional(),
+    description: fields.description,
+    deadline: fields.deadline.optional(),
+    maximumScore: fields.maximumScore.optional(),
   })
-  .refine((data) => data.content || data.repositoryUrl, {
-    message: "At least one of content or repositoryUrl must be provided",
-  });
-
-// 4. Schema chấm bài (Review)
-export const reviewSubmissionSchema = z.object({
-  score: z
-    .number({
-      error: "Score is required",
-    })
-    .min(0, "Score cannot be negative"),
-  feedback: z.string().trim().max(2000).optional(),
-});
+  .refine((d) => Object.keys(d).length > 0, { message: "At least one field is required" });

@@ -1,86 +1,79 @@
-import { submissionRepository } from '../repository/submission.repository.js';
-import { assignmentRepository } from '../repository/assignment.repository.js';
-import { classRepository } from '../repository/class.repository.js';
+import * as submissionRepository from "../repository/submission.repository.js";
+import { findAssignmentOrNotFound } from "./assignment.service.js";
 import {
   BadRequestError,
-  NotFoundError,
+  ConflictError,
   ForbiddenError,
-} from '../core/error.response.js';
+  NotFoundError,
+} from "../core/error.response.js";
+import { assertMemberOfClass, assertMentorOfClass, isMentorOfClass } from "../utils/permission.js";
 
-const extractUserId = (user) => {
-  const rawId = user?.sub || user?.id;
-  if (!rawId) throw new ForbiddenError('Invalid user token identity');
-  return Number(rawId);
+export const toSubmissionResponse = (s) => ({
+  id: s.id,
+  assignmentId: s.assignment_id,
+  memberId: s.member_id,
+  content: s.content,
+  repositoryUrl: s.repository_url,
+  submittedAt: s.submitted_at,
+  score: s.score,
+  feedback: s.feedback,
+  reviewedAt: s.reviewed_at,
+});
+
+const findSubmissionOrNotFound = async (id) => {
+  const s = await submissionRepository.findById(id);
+  if (!s) throw new NotFoundError("Submission not found");
+  return s;
 };
 
-export const submitAssignment = async (assignmentId, data, user) => {
-  const currentUserId = extractUserId(user);
-  const assignment = await assignmentRepository.findById(assignmentId);
-  if (!assignment) throw new NotFoundError('Assignment not found');
-
-  // 1. User phải là Member chính thức của Class chứa Assignment đó
-  const isMember = await classRepository.isMemberOfClass(assignment.class_id, currentUserId);
-  if (!isMember) {
-    throw new ForbiddenError('You are not a member of this class');
+// Thứ tự: 404 assignment -> 403 quyền -> 400 deadline -> 409 trùng
+export const submit = async (user, assignmentId, { content, repositoryUrl }) => {
+  const a = await findAssignmentOrNotFound(assignmentId);
+  await assertMemberOfClass(user, a.class_id); // BR-21
+  if (new Date() > a.deadline) throw new BadRequestError("Deadline has passed"); // BR-23
+  if (await submissionRepository.findOne(assignmentId, user.sub)) {
+    throw new ConflictError("You have already submitted this assignment"); // BR-22
   }
-
-  // 2. Deadline check: now <= deadline, nếu quá hạn trả về 400 Bad Request
-  if (new Date() > new Date(assignment.deadline)) {
-    throw new BadRequestError('Assignment deadline has passed');
-  }
-
-  // 3. Cơ chế Level 7: Upsert in-place
-  return submissionRepository.upsertSubmission(assignmentId, currentUserId, data);
+  const s = await submissionRepository.create({
+    assignment_id: Number(assignmentId),
+    member_id: Number(user.sub),
+    content: content ?? null,
+    repository_url: repositoryUrl ?? null,
+  });
+  return toSubmissionResponse(s);
 };
 
-export const getSubmissionsByAssignment = async (assignmentId, user) => {
-  const currentUserId = extractUserId(user);
-  const assignment = await assignmentRepository.findById(assignmentId);
-  if (!assignment) throw new NotFoundError('Assignment not found');
-
-  const isMentor = Number(assignment.classes.mentor_id) === currentUserId;
-  const isAdmin = user?.role === 'ADMIN';
-
-  if (!isMentor && !isAdmin) {
-    throw new ForbiddenError('Only the class mentor can view all submissions');
+// Mentor: cả lớp. Member: chỉ bài của mình. Admin, người ngoài lớp: 403 (BR-25)
+export const listForAssignment = async (user, assignmentId) => {
+  const a = await findAssignmentOrNotFound(assignmentId);
+  if (await isMentorOfClass(user.sub, a.class_id)) {
+    return (await submissionRepository.findByAssignment(assignmentId)).map(toSubmissionResponse);
   }
-
-  return submissionRepository.findSubmissionsByAssignment(assignmentId);
+  await assertMemberOfClass(user, a.class_id);
+  return (await submissionRepository.findByAssignment(assignmentId, user.sub)).map(
+    toSubmissionResponse
+  );
 };
 
-export const getSubmissionById = async (submissionId, user) => {
-  const currentUserId = extractUserId(user);
-  const submission = await submissionRepository.findById(submissionId);
-  if (!submission) throw new NotFoundError('Submission not found');
-
-  const mentorId = Number(submission.assignments.classes.mentor_id);
-  const isMentor = mentorId === currentUserId;
-  const isOwner = Number(submission.member_id) === currentUserId;
-  const isAdmin = user?.role === 'ADMIN';
-
-  if (!isMentor && !isOwner && !isAdmin) {
-    throw new ForbiddenError('Access denied to this submission');
+// Chính chủ hoặc mentor của lớp (BR-25)
+export const getById = async (user, id) => {
+  const s = await findSubmissionOrNotFound(id);
+  const isOwner = s.member_id === Number(user.sub);
+  if (isOwner || (await isMentorOfClass(user.sub, s.assignments.class_id))) {
+    return toSubmissionResponse(s);
   }
-
-  return submission;
+  throw new ForbiddenError("You do not have permission to view this submission");
 };
 
-export const reviewSubmission = async (submissionId, { score, feedback }, user) => {
-  const currentUserId = extractUserId(user);
-  const submission = await submissionRepository.findById(submissionId);
-  if (!submission) throw new NotFoundError('Submission not found');
-
-  const mentorId = Number(submission.assignments.classes.mentor_id);
-  const isMentor = mentorId === currentUserId;
-
-  if (!isMentor) {
-    throw new ForbiddenError('You are not authorized to review submissions for this class');
-  }
-
-  const maxScore = Number(submission.assignments.maximum_score);
-  if (score < 0 || score > maxScore) {
-    throw new BadRequestError(`Score must be between 0 and ${maxScore}`);
-  }
-
-  return submissionRepository.updateReview(submissionId, score, feedback);
+export const review = async (user, id, { score, feedback }) => {
+  const s = await findSubmissionOrNotFound(id);
+  await assertMentorOfClass(user, s.assignments.class_id); // BR-25, BR-28
+  const max = s.assignments.maximum_score;
+  if (score > max) throw new BadRequestError(`Score must be between 0 and ${max}`); // BR-26
+  const updated = await submissionRepository.update(id, {
+    score,
+    feedback: feedback ?? null,
+    reviewed_at: new Date(), // BR-27
+  });
+  return toSubmissionResponse(updated);
 };

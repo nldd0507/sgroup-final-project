@@ -13,7 +13,7 @@ router.use("/auth", authRouter);
 router.use("/users", userRouter);
 router.use("/classes", classRouter);
 router.use("/lessons", lessonRouter);
-router.use('/assignments', assignmentRouter);
-router.use('/submissions', submissionRouter);
+router.use("/assignments", assignmentRouter);
+router.use("/submissions", submissionRouter);
 
 export default router;

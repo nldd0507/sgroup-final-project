@@ -15,7 +15,6 @@ export const findAll = () =>
     orderBy: { id: "asc" },
   });
 
-// BR-13: lớp mình làm mentor HOẶC lớp mình là member
 export const findVisibleTo = (userId) =>
   prisma.classes.findMany({
     where: {
@@ -36,16 +35,6 @@ export const update = (id, data) =>
   prisma.classes.update({ where: { id: Number(id) }, data, select: class_fields });
 export const remove = (id) => prisma.classes.delete({ where: { id: Number(id) } });
 
-export const isMemberOfClass = async (classId, userId) => {
-  const membership = await prisma.class_members.findFirst({
-    where: {
-      class_id: Number(classId),
-      member_id: Number(userId),
-    },
-  });
-  return Boolean(membership);
-};
-
 export const classRepository = {
   findAll,
   findVisibleTo,
@@ -53,7 +42,6 @@ export const classRepository = {
   create,
   update,
   remove,
-  isMemberOfClass,
 };
 
 export default classRepository;

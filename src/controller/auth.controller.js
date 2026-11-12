@@ -2,11 +2,6 @@ import * as authService from "../service/auth.service.js";
 import catchAsync from "../utils/catchAsync.js";
 import { sendSuccess } from "../utils/responseHelper.js";
 
-export const register = catchAsync(async (req, res) => {
-  const newUser = await authService.register(req.body);
-  return sendSuccess(res, 201, "Register successfully!", newUser);
-});
-
 export const login = catchAsync(async (req, res) => {
   const result = await authService.login(req.body);
   return sendSuccess(res, 200, "Login successfully!", result);

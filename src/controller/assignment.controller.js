@@ -1,33 +1,34 @@
-import * as assignmentService from '../service/assignment.service.js';
-import catchAsync from '../utils/catchAsync.js';
-import { sendSuccess } from '../utils/responseHelper.js';
+import { idParamSchema } from "../schema/common.schema.js";
+import * as assignmentService from "../service/assignment.service.js";
+import catchAsync from "../utils/catchAsync.js";
+import { sendSuccess } from "../utils/responseHelper.js";
 
-export const createAssignment = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await assignmentService.createAssignment(id, req.body, req.user);
-  return sendSuccess(res, 201, 'Assignment created successfully!', result);
+export const getByClass = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const assignments = await assignmentService.getByClass(req.user, id);
+  return sendSuccess(res, 200, "Get assignments successfully", assignments);
 });
 
-export const getAssignmentsByClass = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await assignmentService.getAssignmentsByClass(id, req.user);
-  return sendSuccess(res, 200, 'Get assignments by class successfully!', result);
+export const create = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const assignment = await assignmentService.create(req.user, id, req.body);
+  return sendSuccess(res, 201, "Create assignments successfully", assignment);
 });
 
-export const getAssignmentById = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await assignmentService.getAssignmentById(id, req.user);
-  return sendSuccess(res, 200, 'Get assignment details successfully!', result);
+export const getById = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const assignment = await assignmentService.getById(req.user, id);
+  return sendSuccess(res, 200, "Get assignment successfully", assignment);
 });
 
-export const updateAssignment = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await assignmentService.updateAssignment(id, req.body, req.user);
-  return sendSuccess(res, 200, 'Assignment updated successfully!', result);
+export const update = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  const assignment = await assignmentService.update(req.user, id, req.body);
+  return sendSuccess(res, 200, "Update assignment successfully", assignment);
 });
 
-export const deleteAssignment = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  await assignmentService.deleteAssignment(id, req.user);
-  return sendSuccess(res, 204, 'Assignment deleted successfully!');
+export const remove = catchAsync(async (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  await assignmentService.remove(req.user, id);
+  return sendSuccess(res, 204, "Remove assignment successfully");
 });

@@ -1,79 +1,50 @@
-import prisma from '../config/prisma.config.js';
+import prisma from "../config/prisma.config.js";
 
-export const submissionRepository = {
-  async findByAssignmentAndMember(assignmentId, memberId) {
-    return prisma.submissions.findUnique({
-      where: {
-        assignment_id_member_id: {
-          assignment_id: Number(assignmentId),
-          member_id: Number(memberId),
-        },
-      },
-    });
-  },
+const submission_fields = {
+  id: true,
+  assignment_id: true,
+  member_id: true,
+  content: true,
+  repository_url: true,
+  submitted_at: true,
+  score: true,
+  feedback: true,
+  reviewed_at: true,
+};
 
-  async upsertSubmission(assignmentId, memberId, data) {
-    return prisma.submissions.upsert({
-      where: {
-        assignment_id_member_id: {
-          assignment_id: Number(assignmentId),
-          member_id: Number(memberId),
-        },
-      },
-      // Nộp lại trước deadline: Update in-place, làm mới submitted_at, reset review
-      update: {
-        content: data.content ?? null,
-        repository_url: data.repositoryUrl ?? null,
-        submitted_at: new Date(),
-        score: null,
-        feedback: null,
-        reviewed_at: null,
-      },
-      // Nộp lần đầu: INSERT bản ghi mới
-      create: {
+export const findOne = (assignmentId, memberId) =>
+  prisma.submissions.findUnique({
+    where: {
+      assignment_id_member_id: {
         assignment_id: Number(assignmentId),
         member_id: Number(memberId),
-        content: data.content ?? null,
-        repository_url: data.repositoryUrl ?? null,
-        submitted_at: new Date(),
       },
-    });
-  },
+    },
+    select: { id: true },
+  });
 
-  async findSubmissionsByAssignment(assignmentId) {
-    return prisma.submissions.findMany({
-      where: { assignment_id: Number(assignmentId) },
-      include: {
-        users: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: { submitted_at: 'desc' },
-    });
-  },
+// Có memberId: chỉ bài của người đó (member xem). Không có: cả lớp (mentor xem)
+export const findByAssignment = (assignmentId, memberId) =>
+  prisma.submissions.findMany({
+    where: {
+      assignment_id: Number(assignmentId),
+      ...(memberId && { member_id: Number(memberId) }),
+    },
+    select: submission_fields,
+    orderBy: { submitted_at: "asc" },
+  });
 
-  async findById(submissionId) {
-    return prisma.submissions.findUnique({
-      where: { id: Number(submissionId) },
-      include: {
-        assignments: {
-          include: { classes: true },
-        },
-        users: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-    });
-  },
+// Kèm assignment để lần ra class_id và maximum_score
+export const findById = (id) =>
+  prisma.submissions.findUnique({
+    where: { id: Number(id) },
+    select: {
+      ...submission_fields,
+      assignments: { select: { class_id: true, maximum_score: true } },
+    },
+  });
 
-  async updateReview(submissionId, score, feedback) {
-    return prisma.submissions.update({
-      where: { id: Number(submissionId) },
-      data: {
-        score: Number(score),
-        feedback: feedback ?? null,
-        reviewed_at: new Date(),
-      },
-    });
-  },
-};
+export const create = (data) => prisma.submissions.create({ data, select: submission_fields });
+
+export const update = (id, data) =>
+  prisma.submissions.update({ where: { id: Number(id) }, data, select: submission_fields });

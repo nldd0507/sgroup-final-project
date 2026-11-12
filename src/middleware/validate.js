@@ -11,28 +11,6 @@ export const validate = (schema) => {
   };
 };
 
-export const registerSchema = z.object({
-  name: z
-    .string({ required_error: "Name is required" })
-    .trim()
-    .min(2, "Name must be between 2 and 50 characters")
-    .max(50, "Name must be between 2 and 50 characters"),
-
-  email: z
-    .string({ required_error: "Email is required" })
-    .trim()
-    .email("Email is not valid"),
-
-  password: z
-    .string({ required_error: "Password is required" })
-    .min(8, "Password must be at least 8 characters"),
-  role: z
-    .enum(["ADMIN", "MEMBER"], {
-      errorMap: () => ({ message: "Role must be ADMIN or MEMBER" }),
-    })
-    .optional(),
-});
-
 // 2. Schema Đăng nhập 
 export const loginSchema = z.object({
   email: z
