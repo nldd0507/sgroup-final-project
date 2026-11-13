@@ -47,6 +47,18 @@ export class ApiError extends Error {
 // Backend trả một số câu tiếng Anh: dịch những câu người dùng hay gặp
 const TRANSLATIONS = [
   [/^Invalid email or password$/i, "Email hoặc mật khẩu không đúng."],
+  [/^Email already exists$/i, "Email này đã có người dùng."],
+  [/^Deadline has passed$/i, "Đã quá hạn nộp bài."],
+  [/^You have already submitted/i, "Bạn đã nộp bài này rồi, mỗi người chỉ nộp một lần."],
+  [/^Score must be between 0 and (\d+)/i, (m) => `Điểm phải từ 0 đến ${m[1]}.`],
+  [/^Member already in class$/i, "Người này đã ở trong lớp."],
+  [/^Member not in class$/i, "Người này không còn trong lớp."],
+  [/^The mentor cannot be a member/i, "Mentor của lớp không thể đồng thời là học viên của lớp đó."],
+  [/^End date must be after start date$/i, "Ngày kết thúc phải sau ngày bắt đầu."],
+  [/^Lesson order already exists/i, "Đã có bài học khác dùng số thứ tự này trong lớp."],
+  [/^Mentor not found$/i, "Không tìm thấy người được chọn làm mentor."],
+  [/^Repository URL is not valid$/i, "Link repository không hợp lệ, phải bắt đầu bằng http:// hoặc https://."],
+  [/^Only admin or the class mentor/i, "Chỉ Admin hoặc mentor của lớp xem được danh sách học viên."],
   [/^Too many failed login attempts\. Try again in (\d+) minutes?$/i, (m) => `Sai quá nhiều lần. Thử lại sau ${m[1]} phút.`],
   [/permission/i, "Bạn không có quyền thực hiện thao tác này."],
   [/^Only the mentor of this class/i, "Chỉ mentor của lớp mới làm được thao tác này."],

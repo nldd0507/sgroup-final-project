@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
-import { BookOpenText, LayoutDashboard, LogOut, Menu, Moon, Sun, X } from "lucide-react";
+import { BookOpenText, LayoutDashboard, LogOut, Menu, Moon, School, Sun, Users, X } from "lucide-react";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { useTheme } from "../lib/useTheme.js";
 import { Avatar, ROLE_LABEL } from "./ui.jsx";
 
 // roles: ai thấy mục này trên menu (bỏ trống = mọi người)
-const NAV = [{ to: "/", label: "Tổng quan", icon: LayoutDashboard, end: true }];
+const NAV = [
+  { to: "/", label: "Tổng quan", icon: LayoutDashboard, end: true },
+  { to: "/classes", label: "Lớp học", icon: School },
+  { to: "/users", label: "Người dùng", icon: Users, roles: ["ADMIN"] },
+];
 
 export function Logo() {
   return (
@@ -56,6 +60,7 @@ export default function Layout() {
               <span>{label}</span>
             </NavLink>
           ))}
+          <p className="nav-label">Tài nguyên</p>
           <a className="nav-link" href="/docs" target="_blank" rel="noopener noreferrer">
             <BookOpenText size={18} aria-hidden="true" />
             <span>Tài liệu API</span>
@@ -71,12 +76,12 @@ export default function Layout() {
             </div>
           </div>
           <div className="sidebar-actions">
-            <button type="button" className="btn btn-ghost btn-sm" onClick={toggle}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={toggle} aria-label={theme === "dark" ? "Chuyển giao diện sáng" : "Chuyển giao diện tối"}>
               {theme === "dark" ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
-              {theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
+              {theme === "dark" ? "Sáng" : "Tối"}
             </button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={logout}>
-              <LogOut size={16} aria-hidden="true" /> Đăng xuất
+              <LogOut size={16} aria-hidden="true" /> Thoát
             </button>
           </div>
         </div>

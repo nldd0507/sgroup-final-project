@@ -3,10 +3,14 @@ import { useAuth } from "./AuthContext.jsx";
 import { FullPageLoader } from "../components/ui.jsx";
 
 export default function RequireAuth() {
-  const { status } = useAuth();
+  const { status, endedBy } = useAuth();
   const location = useLocation();
 
   if (status === "loading") return <FullPageLoader />;
-  if (status === "guest") return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (status === "guest") {
+    // Mở link khi chưa đăng nhập hoặc phiên hết hạn: đăng nhập xong quay lại đúng trang đó
+    const state = endedBy === "logout" ? undefined : { from: location.pathname + location.search };
+    return <Navigate to="/login" replace state={state} />;
+  }
   return <Outlet />;
 }

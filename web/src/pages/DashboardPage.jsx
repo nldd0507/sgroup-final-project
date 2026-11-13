@@ -1,4 +1,5 @@
 import { CalendarClock, ClipboardCheck, GraduationCap, Inbox, Presentation, School, Users } from "lucide-react";
+import { Link } from "react-router";
 import { api } from "../api/client.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { useAsync } from "../lib/useAsync.js";
@@ -43,10 +44,10 @@ function AdminDashboard() {
   return (
     <div className="stack">
       <div className="stats stagger">
-        <Stat icon={Users} label="Người dùng" value={users.length} note={`${admins} admin · ${users.length - admins} thành viên`} i={0} />
-        <Stat icon={School} label="Lớp học" value={classes.length} note={`${count("ongoing")} lớp đang học`} i={1} />
-        <Stat icon={Presentation} label="Mentor" value={mentors} note="đang phụ trách ít nhất 1 lớp" i={2} />
-        <Stat icon={CalendarClock} label="Sắp mở" value={count("upcoming")} note="lớp chưa tới ngày bắt đầu" i={3} />
+        <Stat tone="blue" icon={Users} label="Người dùng" value={users.length} note={`${admins} admin · ${users.length - admins} thành viên`} i={0} />
+        <Stat tone="violet" icon={School} label="Lớp học" value={classes.length} note={`${count("ongoing")} lớp đang học`} i={1} />
+        <Stat tone="green" icon={Presentation} label="Mentor" value={mentors} note="đang phụ trách ít nhất 1 lớp" i={2} />
+        <Stat tone="amber" icon={CalendarClock} label="Sắp mở" value={count("upcoming")} note="lớp chưa tới ngày bắt đầu" i={3} />
       </div>
 
       <div className="grid-2">
@@ -62,7 +63,8 @@ function AdminDashboard() {
           ) : (
             <ul className="rows stagger">
               {withStatus.map((c, i) => (
-                <li key={c.id} className="row" style={{ "--i": i }}>
+                <li key={c.id} style={{ "--i": i }}>
+                  <Link to={`/classes/${c.id}`} className="row">
                   <div className="row-main">
                     <span className="row-title">{c.name}</span>
                     <span className="row-sub">
@@ -74,6 +76,7 @@ function AdminDashboard() {
                     <span>{nameOf[c.mentorId] ?? `#${c.mentorId}`}</span>
                   </span>
                   <Chip tone={STATUS_TONE[c.status.key]}>{c.status.label}</Chip>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -195,15 +198,15 @@ function PersonDashboard({ user }) {
   const stats = [];
   if (learning.length) {
     stats.push(
-      { icon: GraduationCap, label: "Lớp đang học", value: learning.length, note: "lớp bạn là học viên" },
-      { icon: ClipboardCheck, label: "Tiến độ trung bình", value: `${avgProgress}%`, note: "bài học đã hoàn thành" },
-      { icon: CalendarClock, label: "Cần nộp tuần này", value: dueThisWeek, note: "bài tập chưa nộp, hạn trong 7 ngày" }
+      { tone: "violet", icon: GraduationCap, label: "Lớp đang học", value: learning.length, note: "lớp bạn là học viên" },
+      { tone: "green", icon: ClipboardCheck, label: "Tiến độ trung bình", value: `${avgProgress}%`, note: "bài học đã hoàn thành" },
+      { tone: "amber", icon: CalendarClock, label: "Cần nộp tuần này", value: dueThisWeek, note: "bài tập chưa nộp, hạn trong 7 ngày" }
     );
   }
   if (teaching.length) {
     stats.push(
-      { icon: Presentation, label: "Lớp đang dạy", value: teaching.length, note: "lớp bạn là mentor" },
-      { icon: Inbox, label: "Bài chờ chấm", value: toReview.length, note: "bài nộp chưa có điểm" }
+      { tone: "blue", icon: Presentation, label: "Lớp đang dạy", value: teaching.length, note: "lớp bạn là mentor" },
+      { tone: "amber", icon: Inbox, label: "Bài chờ chấm", value: toReview.length, note: "bài nộp chưa có điểm" }
     );
   }
 
@@ -224,7 +227,7 @@ function PersonDashboard({ user }) {
               </div>
               <div className="class-cards stagger">
                 {teaching.map((c, i) => (
-                  <article key={c.id} className="class-card" style={{ "--i": i }}>
+                  <Link key={c.id} to={`/classes/${c.id}`} className="class-card" style={{ "--i": i }}>
                     <div className="class-card-top">
                       <h3>{c.name}</h3>
                       <Chip tone={STATUS_TONE[c.status.key]}>{c.status.label}</Chip>
@@ -248,7 +251,7 @@ function PersonDashboard({ user }) {
                         </dd>
                       </div>
                     </dl>
-                  </article>
+                  </Link>
                 ))}
               </div>
             </section>
@@ -261,7 +264,7 @@ function PersonDashboard({ user }) {
               </div>
               <div className="class-cards stagger">
                 {learning.map((c, i) => (
-                  <article key={c.id} className="class-card" style={{ "--i": i }}>
+                  <Link key={c.id} to={`/classes/${c.id}`} className="class-card" style={{ "--i": i }}>
                     <div className="class-card-top">
                       <h3>{c.name}</h3>
                       <Chip tone={STATUS_TONE[c.status.key]}>{c.status.label}</Chip>
@@ -273,7 +276,7 @@ function PersonDashboard({ user }) {
                     <p className="row-sub">
                       Đã học {c.progress.completedLessons}/{c.progress.totalLessons} bài · {c.assignments.length} bài tập
                     </p>
-                  </article>
+                  </Link>
                 ))}
               </div>
             </section>
@@ -295,7 +298,8 @@ function PersonDashboard({ user }) {
                   {upcoming.map((a, i) => {
                     const d = deadlineInfo(a.deadline);
                     return (
-                      <li key={a.id} className="row" style={{ "--i": i }}>
+                      <li key={a.id} style={{ "--i": i }}>
+                        <Link to={`/assignments/${a.id}`} className="row">
                         <div className="row-main">
                           <span className="row-title">{a.title}</span>
                           <span className="row-sub">
@@ -303,6 +307,7 @@ function PersonDashboard({ user }) {
                           </span>
                         </div>
                         {a.submitted ? <Chip tone="ok">Đã nộp</Chip> : <Chip tone={d.tone}>{d.label}</Chip>}
+                        </Link>
                       </li>
                     );
                   })}
@@ -324,7 +329,8 @@ function PersonDashboard({ user }) {
               ) : (
                 <ul className="rows stagger">
                   {toReview.slice(0, 6).map((s, i) => (
-                    <li key={s.id} className="row" style={{ "--i": i }}>
+                    <li key={s.id} style={{ "--i": i }}>
+                      <Link to={`/assignments/${s.assignment.id}?review=${s.id}`} className="row">
                       <Avatar name={s.memberName} size={30} />
                       <div className="row-main">
                         <span className="row-title">{s.assignment.title}</span>
@@ -332,6 +338,8 @@ function PersonDashboard({ user }) {
                           {s.memberName} · {s.className} · nộp {formatDateTime(s.submittedAt)}
                         </span>
                       </div>
+                      <Chip tone="warn">Chấm</Chip>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -346,9 +354,9 @@ function PersonDashboard({ user }) {
 
 /* ---------------- Mảnh dùng chung ---------------- */
 
-function Stat({ icon: Icon, label, value, note, i }) {
+function Stat({ tone, icon: Icon, label, value, note, i }) {
   return (
-    <div className="stat" style={{ "--i": i }}>
+    <div className={`stat${tone ? ` tone-${tone}` : ""}`} style={{ "--i": i }}>
       <span className="stat-icon">
         <Icon size={18} aria-hidden="true" />
       </span>
