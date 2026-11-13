@@ -1,0 +1,21 @@
+# Dùng trên server: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# File này chỉ ghi những chỗ KHÁC so với docker-compose.yml
+services:
+  db:
+    ports: !reset [] # không mở Postgres ra Internet, chỉ backend trong mạng Docker gọi được
+
+  redis:
+    ports: !reset [] # không mở Redis ra Internet (Redis mặc định không có mật khẩu)
+    command: ["redis-server", "--appendonly", "yes"] # ghi xuống đĩa, restart không mất denylist
+    volumes:
+      - redisdata:/data
+
+  backend:
+    ports: !override
+      - "80:3000" # truy cập bằng http://<IP-server>/ không cần gõ :3000
+    environment:
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET phải được đặt trong .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET phải được đặt trong .env}
+
+volumes:
+  redisdata:
