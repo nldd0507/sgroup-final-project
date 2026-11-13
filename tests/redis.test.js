@@ -26,6 +26,9 @@ after(async () => {
     for (const key of await redis.keys("login:fail:*")) await redis.del(key);
   }
   await prisma.assignments.deleteMany({ where: { title: { startsWith: "Redis Test" } } });
+  // Xóa thẳng bằng Prisma không đi qua service nên cache danh sách assignment của lớp còn bản cũ:
+  // phải xóa tay, nếu không 5 phút sau đó API vẫn trả về assignment đã mất
+  await getRedis()?.del(cacheKeys.assignmentsOfClass(BE01));
   await prisma.$disconnect();
 });
 

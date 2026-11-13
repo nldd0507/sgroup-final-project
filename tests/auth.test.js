@@ -25,6 +25,19 @@ test("POST /auth/login: đúng → 200, sai password hay sai email → cùng 401
   assert.equal(wrongPassword.body.message, wrongEmail.body.message);
 });
 
+test("POST /auth/login trả refreshToken, dùng nó lấy được accessToken mới", async () => {
+  const login = await api().post("/auth/login").send({ email: "member@sgroup.com", password: PASSWORD });
+  assert.equal(login.status, 200);
+  assert.ok(login.body.data.refreshToken);
+
+  const refreshed = await api()
+    .post("/auth/refresh-token")
+    .send({ refreshToken: login.body.data.refreshToken });
+  assert.equal(refreshed.status, 200);
+  const me = await api().get("/auth/me").set(auth(refreshed.body.data.accessToken));
+  assert.equal(me.body.data.email, "member@sgroup.com");
+});
+
 test("GET /auth/me: token đúng → 200, thiếu token → 401", async () => {
   const token = await loginAs("member@sgroup.com");
   const me = await api().get("/auth/me").set(auth(token));
