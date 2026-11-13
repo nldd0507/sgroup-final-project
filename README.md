@@ -15,6 +15,22 @@ Tài khoản đăng nhập: xem mục [Seed dữ liệu mẫu](#seed-dữ-liệu
 
 > Nếu đổi qua lại giữa Windows và WSL mà gặp lỗi `Prisma Client could not locate the Query Engine`, chạy lại `npx prisma generate` trong môi trường đang dùng.
 
+## Giao diện web
+
+Code ở thư mục `web/` (React + Vite), có `package.json` riêng. Giao diện nằm ở đường dẫn `/app` vì API đã dùng `/classes`, `/users`... ở gốc.
+
+**Khi code giao diện** (backend chạy ở cổng 3000 như trên):
+
+```bash
+cd web
+npm install
+npm run dev        # http://localhost:5173/app
+```
+
+Vite tự chuyển tiếp các lời gọi `/auth`, `/classes`... sang `http://localhost:3000`, nên không cần CORS. Backend chạy cổng khác thì đặt `API_URL`, ví dụ `API_URL=http://localhost:3100 npm run dev`. Khi chạy dev, trang đăng nhập có nút điền sẵn tài khoản seed.
+
+**Chạy giống production:** `cd web && npm run build` tạo `web/dist`, rồi mở http://localhost:3000/app (Express phục vụ thư mục đó). Docker image tự build bước này, nên trên server chỉ cần `docker compose up -d --build` như cũ.
+
 ## Seed dữ liệu mẫu
 
 Seed tạo sẵn user, class, lesson, tiến độ học, assignment và bài nộp để test API (code ở `prisma/seed.js`).

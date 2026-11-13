@@ -44,6 +44,7 @@ export const login = async ({ email, password }, ip = "unknown") => {
 
   return {
     accessToken,
+    refreshToken,
     user: userResponse,
   };
 };
