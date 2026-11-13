@@ -37,9 +37,10 @@ const findClassOrNotFound = async (classId) => {
 
 // Xem class và nội dung của class: Admin, mentor của lớp, member của lớp (BR-13, BR-16)
 export const assertCanViewClass = async (user, classId) => {
+  // Kiểm tra lớp tồn tại trước, kể cả Admin, để lớp không có luôn trả 404
+  const classItem = await findClassOrNotFound(classId);
   if (user.role === "ADMIN") return;
 
-  const classItem = await findClassOrNotFound(classId);
   const userId = Number(user.sub);
   if (classItem.mentor_id === userId) return;
   if (await isMemberOfClass(userId, classId)) return;

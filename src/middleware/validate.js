@@ -80,14 +80,3 @@ export const refreshTokenRules = z.object({
   refreshToken: z.string().min(1, "RefreshToken is required"),
 });
 
-export const createLessonSchema = z.object({
-  title: z.string({ required_error: "Title is required" }).min(1),
-  content: z.string().optional().default(""),
-  order_no: z.number({ required_error: "order_no is required" }).int().positive(),
-});
-
-export const updateLessonSchema = z.object({
-  title: z.string().min(1).optional(),
-  content: z.string().optional(),
-  order_no: z.number().int().positive().optional(),
-});
