@@ -15,7 +15,8 @@ info:
     Response thành công luôn có dạng `{ "success": true, "message": "...", "data": ... }`.
     Các schema bên dưới mô tả phần `data`. Response lỗi có dạng `{ "success": false, "message": "..." }`.
 servers:
-  - url: http://localhost:3000
+  - url: /
+    description: Cùng địa chỉ với trang Swagger đang mở (localhost hoặc server AWS)
 security:
   - bearerAuth: []
 tags:
@@ -126,7 +127,13 @@ components:
         name: { type: string, example: BE Basic - Batch 02 }
         description: { type: string }
         startDate: { type: string, format: date, example: "2026-12-01" }
-        endDate: { type: string, format: date, example: "2027-01-31", description: "Phải sau startDate (BR-07)" }
+        endDate:
+          {
+            type: string,
+            format: date,
+            example: "2027-01-31",
+            description: "Phải sau startDate (BR-07)",
+          }
         mentorId: { type: integer, example: 4 }
     ClassUpdate:
       type: object
@@ -194,7 +201,12 @@ components:
       properties:
         totalLessons: { type: integer, example: 8 }
         completedLessons: { type: integer, example: 3 }
-        progress: { type: integer, example: 38, description: "round(completed / total × 100), 0 nếu chưa có lesson" }
+        progress:
+          {
+            type: integer,
+            example: 38,
+            description: "round(completed / total × 100), 0 nếu chưa có lesson",
+          }
 
     AssignmentListItem:
       type: object
@@ -249,7 +261,8 @@ components:
       type: object
       required: [score]
       properties:
-        score: { type: integer, minimum: 0, example: 8, description: "0 ≤ score ≤ maximumScore (BR-26)" }
+        score:
+          { type: integer, minimum: 0, example: 8, description: "0 ≤ score ≤ maximumScore (BR-26)" }
         feedback: { type: string, maxLength: 5000, example: "Làm tốt, cần bổ sung validation" }
 
 paths:
@@ -318,7 +331,11 @@ paths:
       tags: [Auth]
       summary: "#2 Thông tin người đang đăng nhập (Any)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/User" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
 
   # ---------------- Users ----------------
@@ -327,7 +344,15 @@ paths:
       tags: [Users]
       summary: "#3 Danh sách user (A)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/User" } } } } }
+        "200":
+          {
+            description: OK,
+            content:
+              {
+                application/json:
+                  { schema: { type: array, items: { $ref: "#/components/schemas/User" } } },
+              },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
     post:
@@ -337,7 +362,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/UserCreate" } } }
       responses:
-        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "201":
+          {
+            description: Đã tạo,
+            content: { application/json: { schema: { $ref: "#/components/schemas/User" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -348,7 +377,11 @@ paths:
       tags: [Users]
       summary: "#4 Chi tiết user (A)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/User" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -359,7 +392,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/UserUpdate" } } }
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/User" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -372,7 +409,15 @@ paths:
       tags: [Classes]
       summary: "#7 Danh sách lớp (Any, lọc theo vai trò)"
       responses:
-        "200": { description: "Admin thấy tất cả; người khác thấy lớp mình dạy hoặc học", content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Class" } } } } }
+        "200":
+          {
+            description: "Admin thấy tất cả; người khác thấy lớp mình dạy hoặc học",
+            content:
+              {
+                application/json:
+                  { schema: { type: array, items: { $ref: "#/components/schemas/Class" } } },
+              },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
     post:
       tags: [Classes]
@@ -381,7 +426,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/ClassCreate" } } }
       responses:
-        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/Class" } } } }
+        "201":
+          {
+            description: Đã tạo,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Class" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -392,7 +441,11 @@ paths:
       tags: [Classes]
       summary: "#8 Chi tiết lớp (A, M, S)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/ClassDetail" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/ClassDetail" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -403,7 +456,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/ClassUpdate" } } }
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Class" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Class" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -424,7 +481,15 @@ paths:
       tags: [Class Members]
       summary: "#12 Danh sách member của lớp (A, M)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/ClassMember" } } } } }
+        "200":
+          {
+            description: OK,
+            content:
+              {
+                application/json:
+                  { schema: { type: array, items: { $ref: "#/components/schemas/ClassMember" } } },
+              },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -441,7 +506,12 @@ paths:
               properties:
                 memberId: { type: integer, example: 16 }
       responses:
-        "201": { description: Đã thêm, content: { application/json: { schema: { $ref: "#/components/schemas/ClassMemberCreated" } } } }
+        "201":
+          {
+            description: Đã thêm,
+            content:
+              { application/json: { schema: { $ref: "#/components/schemas/ClassMemberCreated" } } },
+          }
         "400": { description: "Body sai, hoặc thêm mentor của lớp làm member" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -467,7 +537,17 @@ paths:
       tags: [Lessons]
       summary: "#15 Danh sách lesson của lớp (A, M, S)"
       responses:
-        "200": { description: "Sắp theo order", content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/LessonListItem" } } } } }
+        "200":
+          {
+            description: "Sắp theo order",
+            content:
+              {
+                application/json:
+                  {
+                    schema: { type: array, items: { $ref: "#/components/schemas/LessonListItem" } },
+                  },
+              },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -478,7 +558,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/LessonCreate" } } }
       responses:
-        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } } }
+        "201":
+          {
+            description: Đã tạo,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -490,7 +574,11 @@ paths:
       tags: [Lessons]
       summary: "#16 Chi tiết lesson (A, M, S)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -501,7 +589,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/LessonUpdate" } } }
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Lesson" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -521,7 +613,12 @@ paths:
       tags: [Lessons]
       summary: "#20 Đánh dấu hoàn thành lesson (S), gọi lại không tạo bản ghi mới"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/LessonProgress" } } } }
+        "200":
+          {
+            description: OK,
+            content:
+              { application/json: { schema: { $ref: "#/components/schemas/LessonProgress" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -531,7 +628,12 @@ paths:
       tags: [Lessons]
       summary: "#21 Tiến độ học của chính mình (S)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/ClassProgress" } } } }
+        "200":
+          {
+            description: OK,
+            content:
+              { application/json: { schema: { $ref: "#/components/schemas/ClassProgress" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -543,7 +645,18 @@ paths:
       tags: [Assignments]
       summary: "#22 Danh sách assignment của lớp (A, M, S)"
       responses:
-        "200": { description: "Sắp theo deadline tăng dần", content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/AssignmentListItem" } } } } }
+        "200":
+          {
+            description: "Sắp theo deadline tăng dần",
+            content:
+              {
+                application/json:
+                  {
+                    schema:
+                      { type: array, items: { $ref: "#/components/schemas/AssignmentListItem" } },
+                  },
+              },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -554,7 +667,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/AssignmentCreate" } } }
       responses:
-        "201": { description: Đã tạo, content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } } }
+        "201":
+          {
+            description: Đã tạo,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -565,7 +682,11 @@ paths:
       tags: [Assignments]
       summary: "#23 Chi tiết assignment (A, M, S)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -576,7 +697,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/AssignmentUpdate" } } }
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Assignment" } } },
+          }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -600,7 +725,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/SubmissionCreate" } } }
       responses:
-        "201": { description: Đã nộp, content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } } }
+        "201":
+          {
+            description: Đã nộp,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } },
+          }
         "400": { description: "Quá deadline, hoặc thiếu cả content và repositoryUrl, hoặc URL sai" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -610,7 +739,15 @@ paths:
       tags: [Submissions]
       summary: "#28 Danh sách bài nộp (M: cả lớp, S: chỉ bài của mình)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Submission" } } } } }
+        "200":
+          {
+            description: OK,
+            content:
+              {
+                application/json:
+                  { schema: { type: array, items: { $ref: "#/components/schemas/Submission" } } },
+              },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -620,7 +757,11 @@ paths:
       tags: [Submissions]
       summary: "#29 Chi tiết bài nộp (M, Me)"
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } } }
+        "200":
+          {
+            description: OK,
+            content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } },
+          }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -633,7 +774,11 @@ paths:
         required: true
         content: { application/json: { schema: { $ref: "#/components/schemas/Review" } } }
       responses:
-        "200": { description: "Có score, feedback, reviewedAt", content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } } }
+        "200":
+          {
+            description: "Có score, feedback, reviewedAt",
+            content: { application/json: { schema: { $ref: "#/components/schemas/Submission" } } },
+          }
         "400": { description: "score < 0 hoặc score > maximumScore" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
