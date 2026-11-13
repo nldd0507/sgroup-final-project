@@ -1,15 +1,13 @@
 import { Router } from "express";
-import { lessonController } from "../controller/lesson.controller.js";
+import * as lessonController from "../controller/lesson.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
-import { validate, updateLessonSchema } from "../middleware/validate.js";
+import { validate } from "../middleware/validate.js";
+import { updateLessonSchema } from "../schema/lesson.schema.js";
 
-const Lessonrouter = Router();
-
-Lessonrouter.use(authenticate);
-
-Lessonrouter.get("/:id", lessonController.getLessonById);
-Lessonrouter.patch("/:id", validate(updateLessonSchema), lessonController.updateLesson);
-Lessonrouter.delete("/:id", lessonController.deleteLesson);
-Lessonrouter.post("/:id/complete", lessonController.completeLesson);
-
-export default Lessonrouter;
+const lessonRouter = Router();
+lessonRouter.use(authenticate);
+lessonRouter.get("/:id", lessonController.getById);
+lessonRouter.patch("/:id", validate(updateLessonSchema), lessonController.update);
+lessonRouter.delete("/:id", lessonController.remove);
+lessonRouter.post("/:id/complete", lessonController.complete);
+export default lessonRouter;
